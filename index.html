@@ -1,0 +1,83 @@
+<!doctype>
+<html ng-app="myapps">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+
+<script>
+var app = angular.module('myapps', []);
+app.controller('myCtrl', function($scope,$http) {
+	controller = this;
+	controller.contact={_id:"",name:"",age:"",email:""};
+	var refresh= function(){
+	$http.get('/contactlist').success(function(response){
+	console.log("I got the data i requested");
+	console.table(response);
+	controller.lists = response;
+	controller.contact="";
+	})
+	}
+	
+	refresh();
+	
+	controller.add= function(){
+	console.log(controller.contact);
+	$http.post('/contactlist',controller.contact).success(function(response){
+	console.log(response);
+		refresh();});
+
+	}
+	
+	controller.remove= function(id){
+	console.log(id);
+	$http.delete('/contactlist/'+id).success(function(response){
+		refresh();});
+	};
+	
+	controller.update=function(id){
+	console.log(id);
+	
+	};
+	
+	
+});
+
+</script>
+
+</head>
+<body ng-controller=" myCtrl as controller">
+<title>Contact</title>
+<h1> Contact List</h1>
+<table class ="table">
+<thead>
+<tr>
+	<th>Name</th>
+	<th>Age</th>
+	<th>Email</th>
+	<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr ng-form name="myForm">
+	<td><input id ="name" type="text" ng-model="controller.contact.name" required></td>
+	<td><input id ="age" type="text" ng-model="controller.contact.age" required/></td>
+	<td><input id ="email" type="text" ng-model="controller.contact.email" required/></td>
+	<td><input type="submit" ng-disabled="!myForm.$valid" ng-click="controller.add()" /></td>
+</tr>
+
+<tr ng-repeat="list in controller.lists">
+	<td>{{list.name}}</td>
+	<td>{{list.age}}</td>
+	<td>{{list.email}}</td>
+	<td><button ng-click="controller.update(list._id)"/>Update</td>
+	<td><button ng-click="controller.remove(list._id)"/>Delete</td>
+</tr>
+</tbody>
+</table>
+
+
+</body>
+</html>
